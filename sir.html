@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahasa Melayu Speaking Challenge</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f7fb;
+        color: #222;
+        min-height: 100vh;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #6c5ce7, #00cec9);
+        color: white;
+        text-align: center;
+        padding: 25px 15px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 48px);
+    }
+
+    .header p {
+        margin: 8px 0 0;
+        font-size: 18px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        padding: 25px;
+    }
+
+    .setup {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    .setup h2 {
+        margin-top: 0;
+    }
+
+    input {
+        width: 100%;
+        max-width: 500px;
+        padding: 16px;
+        font-size: 20px;
+        border: 3px solid #ddd;
+        border-radius: 12px;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    button {
+        border: none;
+        border-radius: 14px;
+        padding: 16px 25px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        transform: scale(1.03);
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .start-btn {
+        background: #00b894;
+        color: white;
+        margin-top: 10px;
+    }
+
+    .game {
+        display: none;
+    }
+
+    .student-name {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .progress {
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .sentence-card {
+        background: white;
+        border-radius: 25px;
+        padding: 35px 25px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border-top: 10px solid #6c5ce7;
+    }
+
+    .instruction {
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: #555;
+    }
+
+    .sentence {
+        font-size: clamp(27px, 5vw, 45px);
+        line-height: 1.4;
+        font-weight: bold;
+        margin: 25px auto;
+        max-width: 850px;
+    }
+
+    .mic-btn {
+        background: #e84393;
+        color: white;
+        font-size: 25px;
+        padding: 20px 35px;
+        min-width: 250px;
+    }
+
+    .mic-btn.listening {
+        background: #d63031;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+
+    .status {
+        min-height: 45px;
+        margin-top: 20px;
+        font-size: 21px;
+        font-weight: bold;
+    }
+
+    .result {
+        display: none;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 18px;
+    }
+
+    .correct {
+        background: #dff9e8;
+        color: #087f3f;
+        border: 3px solid #00b894;
+    }
+
+    .wrong {
+        background: #ffe5e5;
+        color: #b00020;
+        border: 3px solid #d63031;
+    }
+
+    .result-title {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .spoken-text {
+        margin-top: 15px;
+        font-size: 19px;
+        color: #333;
+    }
+
+    .next-btn {
+        background: #0984e3;
+        color: white;
+        margin-top: 20px;
+    }
+
+    .retry-btn {
+        background: #fdcb6e;
+        color: #222;
+        margin-top: 20px;
+        margin-right: 10px;
+    }
+
+    .score-box {
+        background: #ffeaa7;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 20px auto;
+        max-width: 300px;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .finished {
+        display: none;
+        background: white;
+        border-radius: 25px;
+        padding: 40px 25px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .finished h2 {
+        font-size: 42px;
+        margin-top: 0;
+    }
+
+    .final-score {
+        font-size: 60px;
+        font-weight: bold;
+        color: #6c5ce7;
+        margin: 20px;
+    }
+
+    .reset-btn {
+        background: #636e72;
+        color: white;
+        margin-top: 15px;
+    }
+
+    .tip {
+        background: #eef2ff;
+        padding: 15px;
+        border-radius: 12px;
+        margin-top: 20px;
+        font-size: 15px;
+        color: #444;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+
+        .sentence-card {
+            padding: 25px 15px;
+        }
+
+        .sentence {
+            font-size: 27px;
+        }
+
+        button {
+            width: 100%;
+            margin: 6px 0;
+        }
+
+        .retry-btn {
+            margin-right: 0;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <h1>🎤 Bahasa Melayu Speaking Challenge</h1>
+    <p>Baca ayat dengan jelas dan tepat!</p>
+</header>
+
+<div class="container">
+
+    <!-- SETUP -->
+    <div class="setup" id="setup">
+        <h2>👩‍🎓 Student Information</h2>
+
+        <p>Masukkan nama murid sebelum memulakan ujian.</p>
+
+        <input
+            type="text"
+            id="studentName"
+            placeholder="Contoh: Aiman"
+            autocomplete="off"
+        >
+
+        <br>
+
+        <button class="start-btn" onclick="startTest()">
+            🚀 MULA UJIAN
+        </button>
+
+        <div class="tip">
+            💡 <strong>Tip:</strong> Gunakan Google Chrome atau Microsoft Edge
+            dan benarkan akses microphone apabila diminta.
+        </div>
+    </div>
+
+    <!-- GAME -->
+    <div class="game" id="game">
+
+        <div class="student-name" id="displayName"></div>
+
+        <div class="progress" id="progress">
+            Ayat 1
+        </div>
+
+        <div class="score-box">
+            ⭐ Score: <span id="score">0</span>
+        </div>
+
+        <div class="sentence-card">
+
+            <div class="instruction">
+                🎤 Baca ayat di bawah dengan kuat dan jelas.
+            </div>
+
+            <div class="sentence" id="sentence">
+                Loading...
+            </div>
+
+            <button
+                class="mic-btn"
+                id="micButton"
+                onclick="startListening()"
+            >
+                🎤 MULA BERCAKAP
+            </button>
+
+            <div class="status" id="status">
+                Tekan butang apabila anda sudah bersedia.
+            </div>
+
+            <div class="result" id="result">
+
+                <div class="result-title" id="resultTitle"></div>
+
+                <div class="spoken-text">
+                    <strong>Anda berkata:</strong>
+                    <br>
+                    <span id="spokenText"></span>
+                </div>
+
+                <button
+                    class="retry-btn"
+                    id="retryButton"
+                    onclick="retrySentence()"
+                >
+                    🔄 CUBA LAGI
+                </button>
+
+                <button
+                    class="next-btn"
+                    id="nextButton"
+                    onclick="nextSentence()"
+                >
+                    ➡️ AYAT SETERUSNYA
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FINISHED -->
+    <div class="finished" id="finished">
+
+        <h2>🎉 Tahniah!</h2>
+
+        <p id="finishedName"></p>
+
+        <p>Speaking Test Selesai!</p>
+
+        <div class="final-score">
+            <span id="finalScore">0</span>/10
+        </div>
+
+        <p id="finalMessage"></p>
+
+        <button class="reset-btn" onclick="resetGame()">
+            🔄 STUDENT SETERUSNYA
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ==========================================
+   20 MALAY SPEAKING TEST SENTENCES
+========================================== */
+
+const sentences = [
+
+    "Ali membela seekor kucing hitam yang comel dan gemuk bernama Ciktom.",
+
+    "Siti membeli sebatang pensel biru yang panjang di kedai buku sekolah.",
+
+    "Amir sedang membaca sebuah buku cerita yang sangat menarik di perpustakaan.",
+
+    "Kakak memasak sepinggan nasi goreng yang pedas untuk makan tengah hari.",
+
+    "Ibu menanam beberapa batang pokok bunga yang cantik di halaman rumah.",
+
+    "Adik bermain dengan seekor arnab putih yang sangat gebu di taman.",
+
+    "Ahmad membawa sebuah beg sekolah berwarna merah yang besar ke dalam kelas.",
+
+    "Pada setiap pagi, ayah menghantar adik ke sekolah dengan menaiki kereta.",
+
+    "Aina suka membaca novel sambil duduk di bawah pokok yang rendang.",
+
+    "Mereka bermain bola sepak bersama-sama di padang selepas waktu persekolahan.",
+
+    "Datuk sedang menyiram pokok-pokok bunga yang tumbuh subur di belakang rumah.",
+
+    "Seekor burung kecil berwarna kuning sedang hinggap di atas pagar rumah.",
+
+    "Farah membantu ibunya mengemas ruang tamu sebelum tetamu datang berkunjung.",
+
+    "Kami pergi ke pasar untuk membeli buah-buahan dan sayur-sayuran yang segar.",
+
+    "Pada hujung minggu, keluarga saya suka berkelah di tepi sungai yang jernih.",
+
+    "Guru itu sedang menerangkan pelajaran kepada murid-murid dengan penuh kesabaran.",
+
+    "Seekor anjing coklat yang besar sedang tidur di bawah meja kayu.",
+
+    "Hanif memakai sehelai baju Melayu berwarna hijau semasa menghadiri majlis sekolah.",
+
+    "Selepas hujan berhenti, kami melihat sebuah pelangi yang sangat cantik di langit.",
+
+    "Nenek membuat beberapa biji kuih yang sedap untuk diberikan kepada jiran-jiran."
+
+];
+
+
+/* ==========================================
+   GAME VARIABLES
+========================================== */
+
+let studentName = "";
+let currentSentence = "";
+let score = 0;
+let questionNumber = 0;
+
+let usedSentences = [];
+
+let recognition = null;
+let isListening = false;
+let answerProcessed = false;
+
+
+/* ==========================================
+   START TEST
+========================================== */
+
+function startTest() {
+
+    const nameInput = document.getElementById("studentName");
+
+    studentName = nameInput.value.trim();
+
+    if (studentName === "") {
+        alert("Sila masukkan nama murid terlebih dahulu.");
+        nameInput.focus();
+        return;
+    }
+
+    score = 0;
+    questionNumber = 0;
+
+    usedSentences = shuffle([...sentences]);
+
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("finished").style.display = "none";
+    document.getElementById("game").style.display = "block";
+
+    document.getElementById("displayName").textContent =
+        "👩‍🎓 " + studentName;
+
+    document.getElementById("score").textContent = score;
+
+    loadSentence();
+}
+
+
+/* ==========================================
+   LOAD NEW SENTENCE
+========================================== */
+
+function loadSentence() {
+
+    if (questionNumber >= 10) {
+        finishTest();
+        return;
+    }
+
+    currentSentence = usedSentences[questionNumber];
+
+    document.getElementById("sentence").textContent =
+        currentSentence;
+
+    document.getElementById("progress").textContent =
+        "Ayat " + (questionNumber + 1) + " / 10";
+
+    document.getElementById("status").textContent =
+        "Tekan 🎤 MULA BERCAKAP apabila anda sudah bersedia.";
+
+    document.getElementById("result").style.display = "none";
+
+    const micButton = document.getElementById("micButton");
+
+    micButton.disabled = false;
+    micButton.classList.remove("listening");
+    micButton.textContent = "🎤 MULA BERCAKAP";
+
+    answerProcessed = false;
+}
+
+
+/* ==========================================
+   SPEECH RECOGNITION
+========================================== */
+
+function startListening() {
+
+    if (isListening) {
+        return;
+    }
+
+    answerProcessed = false;
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Speech Recognition tidak disokong oleh browser ini. " +
+            "Sila gunakan Google Chrome atau Microsoft Edge."
+        );
+
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "ms-MY";
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    isListening = true;
+
+    const micButton = document.getElementById("micButton");
+
+    micButton.disabled = true;
+    micButton.classList.add("listening");
+    micButton.textContent = "🔴 SEDANG MENDENGAR...";
+
+    document.getElementById("status").textContent =
+        "🎤 Sila baca ayat sekarang...";
+
+    recognition.onresult = function(event) {
+
+        const transcript =
+            event.results[0][0].transcript;
+
+        checkAnswer(transcript);
+    };
+
+
+    recognition.onerror = function(event) {
+
+        isListening = false;
+
+        micButton.disabled = false;
+        micButton.classList.remove("listening");
+        micButton.textContent = "🎤 MULA BERCAKAP";
+
+        if (event.error === "not-allowed") {
+
+            document.getElementById("status").textContent =
+                "⚠️ Microphone tidak dibenarkan. Sila benarkan akses microphone.";
+
+        } else {
+
+            document.getElementById("status").textContent =
+                "⚠️ Tidak dapat mendengar suara. Cuba lagi.";
+        }
+    };
+
+
+    recognition.onend = function() {
+
+        isListening = false;
+
+        if (!answerProcessed) {
+
+            micButton.disabled = false;
+            micButton.classList.remove("listening");
+            micButton.textContent = "🎤 CUBA LAGI";
+        }
+    };
+
+
+    recognition.start();
+}
+
+
+/* ==========================================
+   CHECK ANSWER
+========================================== */
+
+function checkAnswer(transcript) {
+
+    if (answerProcessed) {
+        return;
+    }
+
+    answerProcessed = true;
+    isListening = false;
+
+    const micButton = document.getElementById("micButton");
+
+    micButton.disabled = true;
+    micButton.classList.remove("listening");
+
+    const spoken = normalizeText(transcript);
+    const expected = normalizeText(currentSentence);
+
+    const accuracy = calculateSimilarity(
+        spoken,
+        expected
+    );
+
+    document.getElementById("spokenText").textContent =
+        transcript;
+
+
+    /*
+       85% or above = correct.
+       This allows small differences in punctuation
+       and minor speech-recognition errors.
+    */
+
+    if (accuracy >= 0.85) {
+
+        score++;
+
+        document.getElementById("score").textContent =
+            score;
+
+        showCorrect(accuracy);
+
+    } else {
+
+        showWrong(accuracy);
+    }
+}
+
+
+/* ==========================================
+   CORRECT RESULT
+========================================== */
+
+function showCorrect(accuracy) {
+
+    const result = document.getElementById("result");
+
+    result.className = "result correct";
+    result.style.display = "block";
+
+    document.getElementById("resultTitle").textContent =
+        "🟢 BETUL! 🎉";
+
+    document.getElementById("status").textContent =
+        "Excellent! Ayat anda hampir sama dengan ayat yang diberikan.";
+
+    document.getElementById("retryButton").style.display =
+        "none";
+
+    document.getElementById("nextButton").style.display =
+        "inline-block";
+}
+
+
+/* ==========================================
+   WRONG RESULT
+========================================== */
+
+function showWrong(accuracy) {
+
+    const result = document.getElementById("result");
+
+    result.className = "result wrong";
+    result.style.display = "block";
+
+    document.getElementById("resultTitle").textContent =
+        "🔴 CUBA LAGI!";
+
+    document.getElementById("status").textContent =
+        "Ada beberapa perkataan yang tidak tepat.";
+
+    document.getElementById("retryButton").style.display =
+        "inline-block";
+
+    document.getElementById("nextButton").style.display =
+        "none";
+}
+
+
+/* ==========================================
+   RETRY
+========================================== */
+
+function retrySentence() {
+
+    document.getElementById("result").style.display =
+        "none";
+
+    document.getElementById("spokenText").textContent =
+        "";
+
+    document.getElementById("status").textContent =
+        "Cuba baca ayat sekali lagi.";
+
+    const micButton =
+        document.getElementById("micButton");
+
+    micButton.disabled = false;
+    micButton.classList.remove("listening");
+    micButton.textContent = "🎤 MULA BERCAKAP";
+
+    answerProcessed = false;
+}
+
+
+/* ==========================================
+   NEXT SENTENCE
+========================================== */
+
+function nextSentence() {
+
+    if (!answerProcessed) {
+        return;
+    }
+
+    questionNumber++;
+
+    loadSentence();
+}
+
+
+/* ==========================================
+   FINISH TEST
+========================================== */
+
+function finishTest() {
+
+    document.getElementById("game").style.display =
+        "none";
+
+    document.getElementById("finished").style.display =
+        "block";
+
+    document.getElementById("finishedName").textContent =
+        studentName;
+
+    document.getElementById("finalScore").textContent =
+        score;
+
+
+    let message = "";
+
+    if (score === 10) {
+
+        message =
+            "🌟 PERFECT! Sebutan anda sangat baik!";
+
+    } else if (score >= 8) {
+
+        message =
+            "👏 GREAT JOB! Teruskan usaha anda!";
+
+    } else if (score >= 6) {
+
+        message =
+            "👍 GOOD TRY! Cuba tingkatkan ketepatan sebutan.";
+
+    } else {
+
+        message =
+            "💪 KEEP PRACTISING! Anda boleh buat lebih baik.";
+
+    }
+
+    document.getElementById("finalMessage").textContent =
+        message;
+}
+
+
+/* ==========================================
+   RESET FOR NEXT STUDENT
+========================================== */
+
+function resetGame() {
+
+    if (recognition && isListening) {
+
+        try {
+            recognition.stop();
+        } catch (e) {}
+    }
+
+    isListening = false;
+
+    document.getElementById("finished").style.display =
+        "none";
+
+    document.getElementById("game").style.display =
+        "none";
+
+    document.getElementById("setup").style.display =
+        "block";
+
+    document.getElementById("studentName").value =
+        "";
+
+    document.getElementById("studentName").focus();
+
+    score = 0;
+    questionNumber = 0;
+    usedSentences = [];
+}
+
+
+/* ==========================================
+   NORMALIZE TEXT
+========================================== */
+
+function normalizeText(text) {
+
+    return text
+        .toLowerCase()
+        .replace(/[.,!?;:()]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+
+/* ==========================================
+   TEXT SIMILARITY
+========================================== */
+
+function calculateSimilarity(a, b) {
+
+    const wordsA = a.split(" ");
+    const wordsB = b.split(" ");
+
+    let matches = 0;
+
+    wordsB.forEach(word => {
+
+        if (wordsA.includes(word)) {
+            matches++;
+        }
+
+    });
+
+    return matches / wordsB.length;
+}
+
+
+/* ==========================================
+   SHUFFLE
+========================================== */
+
+function shuffle(array) {
+
+    for (
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(Math.random() * (i + 1));
+
+        [array[i], array[j]] =
+            [array[j], array[i]];
+    }
+
+    return array;
+}
+
+
+/* ==========================================
+   ENTER KEY
+========================================== */
+
+document
+    .getElementById("studentName")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+            startTest();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
